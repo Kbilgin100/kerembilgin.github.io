@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Monetag Rewarded Video SDK -->
-  <script
+  <script 
     src="https://libtl.com/sdk.js"
     data-zone="10400049"
     data-sdk="show_10400049">
@@ -16,22 +16,22 @@
     body {
       margin: 0;
       height: 100vh;
+      font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #0f172a, #020617);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      color: white;
-      text-align: center;
+      color: #fff;
     }
 
-    .card {
-      background: #020617;
+    .box {
+      background: rgba(255,255,255,0.05);
       padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 0 40px rgba(0,255,150,0.15);
+      text-align: center;
       width: 90%;
-      max-width: 360px;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
     }
 
     h1 {
@@ -41,20 +41,20 @@
 
     p {
       font-size: 14px;
-      opacity: 0.85;
+      opacity: 0.8;
     }
 
     button {
       margin-top: 20px;
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       font-size: 16px;
       font-weight: bold;
       border: none;
       border-radius: 12px;
-      background: #22c55e;
-      color: #022c22;
       cursor: pointer;
+      background: #22c55e;
+      color: #000;
     }
 
     button:disabled {
@@ -62,51 +62,64 @@
       cursor: not-allowed;
     }
 
-    #status {
+    .status {
       margin-top: 15px;
       font-size: 14px;
+      min-height: 20px;
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>🎬 Ödüllü Reklam</h1>
-    <p>Videoyu izle, bilet kazan</p>
 
-    <button id="watchBtn" onclick="watchAd()">
-      ▶️ Videoyu İzle
-    </button>
+  <div class="box">
+    <h1>🎥 Ödüllü Reklam</h1>
+    <p>Videoyu izle, ödülünü kazan</p>
 
-    <div id="status"></div>
+    <button id="watchBtn">Videoyu İzle</button>
+
+    <div class="status" id="status"></div>
   </div>
 
   <script>
-    function watchAd() {
-      const status = document.getElementById("status");
-      const btn = document.getElementById("watchBtn");
+    const btn = document.getElementById("watchBtn");
+    const statusText = document.getElementById("status");
 
-      if (typeof show_10400049 !== "function") {
-        status.innerText = "⏳ Reklam henüz hazır değil, biraz bekle";
-        return;
+    let dailyLimit = 20;
+    let watchedToday = localStorage.getItem("watched") || 0;
+
+    function updateStatus() {
+      statusText.innerText = `Bugün izlenen: ${watchedToday}/${dailyLimit}`;
+      if (watchedToday >= dailyLimit) {
+        btn.disabled = true;
+        btn.innerText = "Günlük limit doldu";
       }
+    }
 
+    updateStatus();
+
+    btn.onclick = () => {
       btn.disabled = true;
-      status.innerText = "📡 Reklam yükleniyor...";
+      statusText.innerText = "⏳ Video yükleniyor...";
 
-      show_10400049("pop")
+      show_10400049('pop')
         .then(() => {
-          status.innerText = "✅ Video izlendi! Ödül verilebilir.";
+          watchedToday++;
+          localStorage.setItem("watched", watchedToday);
+
+          statusText.innerText = "✅ Video izlendi, ödül verildi!";
           btn.disabled = false;
 
-          // 🔥 BURAYA ÖDÜL KODUN GELECEK (bilet +1 gibi)
-          // Telegram botuna fetch atabilirsin
+          updateStatus();
+
+          // 🔔 Burada Telegram botuna bildirim veya backend API çağrısı yapılabilir
         })
         .catch(() => {
-          status.innerText = "❌ Video tamamlanmadı";
+          statusText.innerText = "❌ Video tamamlanmadı";
           btn.disabled = false;
         });
-    }
+    };
   </script>
+
 </body>
 </html>
