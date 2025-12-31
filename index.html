@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>🎁 Ödüllü Video</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>🎥 Ödüllü Video</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Monetag Rewarded Video SDK -->
-  <script 
+  <script
     src="https://libtl.com/sdk.js"
     data-zone="10400049"
     data-sdk="show_10400049">
@@ -16,32 +16,32 @@
     body {
       margin: 0;
       height: 100vh;
-      font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #0f172a, #020617);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
       color: #fff;
     }
 
     .box {
+      width: 90%;
+      max-width: 380px;
       background: rgba(255,255,255,0.05);
       padding: 30px;
       border-radius: 16px;
       text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
     }
 
     h1 {
-      margin-bottom: 10px;
       font-size: 22px;
+      margin-bottom: 10px;
     }
 
     p {
       font-size: 14px;
-      opacity: 0.8;
+      opacity: 0.85;
     }
 
     button {
@@ -52,9 +52,9 @@
       font-weight: bold;
       border: none;
       border-radius: 12px;
-      cursor: pointer;
       background: #22c55e;
-      color: #000;
+      color: #022c22;
+      cursor: pointer;
     }
 
     button:disabled {
@@ -62,8 +62,14 @@
       cursor: not-allowed;
     }
 
-    .status {
+    #timer {
       margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    #status {
+      margin-top: 10px;
       font-size: 14px;
       min-height: 20px;
     }
@@ -73,52 +79,65 @@
 <body>
 
   <div class="box">
-    <h1>🎥 Ödüllü Reklam</h1>
-    <p>Videoyu izle, ödülünü kazan</p>
+    <h1>🎬 Ödüllü Reklam</h1>
+    <p>Reklamı izle, ödül kazan</p>
 
-    <button id="watchBtn">Videoyu İzle</button>
+    <button id="watchBtn" onclick="startTimer()">
+      ▶️ Videoyu İzle
+    </button>
 
-    <div class="status" id="status"></div>
+    <div id="timer"></div>
+    <div id="status"></div>
   </div>
 
   <script>
     const btn = document.getElementById("watchBtn");
-    const statusText = document.getElementById("status");
+    const timerEl = document.getElementById("timer");
+    const statusEl = document.getElementById("status");
 
-    let dailyLimit = 20;
-    let watchedToday = localStorage.getItem("watched") || 0;
+    // 🔒 Rastgele süre: 30–45 saniye
+    const minTime = 30;
+    const maxTime = 45;
+    let waitTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
 
-    function updateStatus() {
-      statusText.innerText = `Bugün izlenen: ${watchedToday}/${dailyLimit}`;
-      if (watchedToday >= dailyLimit) {
-        btn.disabled = true;
-        btn.innerText = "Günlük limit doldu";
-      }
+    let countdown;
+
+    function startTimer() {
+      btn.disabled = true;
+      statusEl.innerText = "⏳ Güvenlik kontrolü başlatıldı";
+      timerEl.innerText = `⏱ Lütfen ${waitTime} saniye bekleyin`;
+
+      countdown = setInterval(() => {
+        waitTime--;
+        timerEl.innerText = `⏱ Lütfen ${waitTime} saniye bekleyin`;
+
+        if (waitTime <= 0) {
+          clearInterval(countdown);
+          timerEl.innerText = "🎬 Reklam açılıyor...";
+          launchAd();
+        }
+      }, 1000);
     }
 
-    updateStatus();
-
-    btn.onclick = () => {
-      btn.disabled = true;
-      statusText.innerText = "⏳ Video yükleniyor...";
+    function launchAd() {
+      if (typeof show_10400049 !== "function") {
+        statusEl.innerText = "⚠️ Reklam henüz hazır değil";
+        btn.disabled = false;
+        return;
+      }
 
       show_10400049('pop')
         .then(() => {
-          watchedToday++;
-          localStorage.setItem("watched", watchedToday);
-
-          statusText.innerText = "✅ Video izlendi, ödül verildi!";
+          statusEl.innerText = "✅ Video izlendi, ödül verildi!";
           btn.disabled = false;
 
-          updateStatus();
-
-          // 🔔 Burada Telegram botuna bildirim veya backend API çağrısı yapılabilir
+          // 🔔 BURAYA: Telegram bot / backend ödül bildirimi
         })
         .catch(() => {
-          statusText.innerText = "❌ Video tamamlanmadı";
+          statusEl.innerText = "❌ Video tamamlanmadı";
           btn.disabled = false;
         });
-    };
+    }
   </script>
 
 </body>
