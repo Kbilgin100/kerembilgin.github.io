@@ -2,56 +2,75 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Ödüllü Video</title>
+  <title>🎥 Ödüllü Reklam</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Monetag Script -->
-  <script
-    src="https://alwingulla.com/88/tag.min.js"
-    data-zone="10350506"
-    async>
+  <!-- Monetag Rewarded Video SDK -->
+  <script src="https://libtl.com/sdk.js"
+          data-zone="10400049"
+          data-sdk="show_10400049">
   </script>
 
   <style>
     body {
-      background: #0f172a;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 80px;
+      background:#0f172a;
+      color:#fff;
+      font-family:Arial, sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
+    }
+    .box {
+      text-align:center;
     }
     button {
-      background: #22c55e;
-      border: none;
-      padding: 16px 28px;
-      font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
+      background:#22c55e;
+      border:none;
+      padding:15px 30px;
+      font-size:18px;
+      border-radius:10px;
+      cursor:pointer;
+      color:#000;
     }
     #status {
-      margin-top: 20px;
-      font-size: 16px;
+      margin-top:15px;
+      font-size:16px;
     }
   </style>
 </head>
 
 <body>
+  <div class="box">
+    <h2>🎬 Ödüllü Reklam</h2>
+    <p>Reklamı izleyerek bilet kazan</p>
 
-  <h2>🎥 Ödüllü Reklam</h2>
-  <p>Reklamı izleyerek bilet kazan</p>
+    <button onclick="showAd()">▶ Videoyu İzle</button>
 
-  <button onclick="showRewardedAd()">
-    ▶️ Videoyu İzle
-  </button>
-
-  <div id="status"></div>
+    <div id="status"></div>
+  </div>
 
   <script>
-    function showRewardedAd() {
-      document.getElementById("status").innerText =
-        "⏳ Reklam çağrıldı. Monetag hazırsa açılacaktır.";
+    function showAd() {
+      document.getElementById("status").innerText = "⏳ Video yükleniyor...";
+
+      if (typeof show_10400049 === "function") {
+        show_10400049()
+          .then(() => {
+            document.getElementById("status").innerText =
+              "✅ Video izlendi, ödül ver!";
+            // 👉 BURADA: Telegram botuna ödül bildirimi yapılır
+          })
+          .catch(() => {
+            document.getElementById("status").innerText =
+              "❌ Video tamamlanmadı";
+          });
+      } else {
+        document.getElementById("status").innerText =
+          "⚠️ Reklam henüz hazır değil";
+      }
     }
   </script>
-
 </body>
 </html>
