@@ -1,75 +1,111 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>🎥 Ödüllü Reklam</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>🎁 Ödüllü Video</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Monetag Rewarded Video SDK -->
-  <script src="https://libtl.com/sdk.js"
-          data-zone="10400049"
-          data-sdk="show_10400049">
+  <script
+    src="https://libtl.com/sdk.js"
+    data-zone="10400049"
+    data-sdk="show_10400049">
   </script>
 
   <style>
     body {
-      background:#0f172a;
-      color:#fff;
-      font-family:Arial, sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      margin:0;
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
     }
-    .box {
-      text-align:center;
+
+    .card {
+      background: #020617;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0,255,150,0.15);
+      width: 90%;
+      max-width: 360px;
     }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
     button {
-      background:#22c55e;
-      border:none;
-      padding:15px 30px;
-      font-size:18px;
-      border-radius:10px;
-      cursor:pointer;
-      color:#000;
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: #22c55e;
+      color: #022c22;
+      cursor: pointer;
     }
+
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+
     #status {
-      margin-top:15px;
-      font-size:16px;
+      margin-top: 15px;
+      font-size: 14px;
     }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <h2>🎬 Ödüllü Reklam</h2>
-    <p>Reklamı izleyerek bilet kazan</p>
+  <div class="card">
+    <h1>🎬 Ödüllü Reklam</h1>
+    <p>Videoyu izle, bilet kazan</p>
 
-    <button onclick="showAd()">▶ Videoyu İzle</button>
+    <button id="watchBtn" onclick="watchAd()">
+      ▶️ Videoyu İzle
+    </button>
 
     <div id="status"></div>
   </div>
 
   <script>
-    function showAd() {
-      document.getElementById("status").innerText = "⏳ Video yükleniyor...";
+    function watchAd() {
+      const status = document.getElementById("status");
+      const btn = document.getElementById("watchBtn");
 
-      if (typeof show_10400049 === "function") {
-        show_10400049()
-          .then(() => {
-            document.getElementById("status").innerText =
-              "✅ Video izlendi, ödül ver!";
-            // 👉 BURADA: Telegram botuna ödül bildirimi yapılır
-          })
-          .catch(() => {
-            document.getElementById("status").innerText =
-              "❌ Video tamamlanmadı";
-          });
-      } else {
-        document.getElementById("status").innerText =
-          "⚠️ Reklam henüz hazır değil";
+      if (typeof show_10400049 !== "function") {
+        status.innerText = "⏳ Reklam henüz hazır değil, biraz bekle";
+        return;
       }
+
+      btn.disabled = true;
+      status.innerText = "📡 Reklam yükleniyor...";
+
+      show_10400049("pop")
+        .then(() => {
+          status.innerText = "✅ Video izlendi! Ödül verilebilir.";
+          btn.disabled = false;
+
+          // 🔥 BURAYA ÖDÜL KODUN GELECEK (bilet +1 gibi)
+          // Telegram botuna fetch atabilirsin
+        })
+        .catch(() => {
+          status.innerText = "❌ Video tamamlanmadı";
+          btn.disabled = false;
+        });
     }
   </script>
 </body>
